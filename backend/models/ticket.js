@@ -6,9 +6,9 @@ const ticketSchema = new Schema({
     descripcion: String,
     tema: String,
     areaEncargada: String,
-    estado: {type: String, enum: ["CREADO","ABIERTO","EN PROCESO","RESUELTO"]},
+    estado: {type: String, enum: [ "ABIERTO","EN PROCESO","RESUELTO"]},
     prioridad: String,
-    fecha: String,
+    fecha: Date,
     cliente: {type: Schema.Types.ObjectId, ref: "clientes"}
 });
 

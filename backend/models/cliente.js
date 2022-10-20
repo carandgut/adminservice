@@ -1,17 +1,17 @@
-const mongoose = require("mongoose");
+const {Schema,model} = require("mongoose");
 
 const cliente = {
-    tipoDocumento : String,
-    identificacion : String,
-    nombre : String,
-    apellido : String,
-    email : String,
+    tipoDocumento : {type: String, required: [true, "Tipo documento es requerido."]},
+    identificacion : {type: String, unique: true, required: [true," La Identificacion requerida."]},
+    nombre : {type: String, required:[true,"El nombre es requerido."]},
+    apellido : {type: String, required: [true, "El apellido es requerido."]},
+    email : {type: String, unique: true, required: [true, "El email es requerido."]},
     telefono : String,
-    password : String
+    password : {type: String, required:[true, "La contraseña es requerida."]}
 }
 
-const clienteSquema = mongoose.Schema(cliente);
+const clienteSquema = new Schema(cliente);
 
-const ClienteModelo = mongoose.model("clientes",clienteSquema);
+const ClienteModelo = model("clientes",clienteSquema);
 
 module.exports = ClienteModelo;
