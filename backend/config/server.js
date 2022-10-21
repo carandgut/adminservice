@@ -1,4 +1,6 @@
 const express = require("express");
+const conexionDb = require("./conexiondb");
+const rutasCliente = require("../routers/cliente.routes");
 
 class server{
     constructor(){
@@ -7,15 +9,18 @@ class server{
         this.app = express();
 
         this.app.use(express.json());
-        this.app.listen(puerto,()=>{
+        this.app.listen(this.puerto,()=>{
             console.log("El servidor se esta ejecutando");
         });
-        this.rutas();   
+        this.rutas();
+
+        conexionDb();
     }
 
     rutas(){
-
-        this.app.post("/registro",);    
-
+        
+        this.app.use("/",rutasCliente);
     }
 }
+
+module.exports = server;
