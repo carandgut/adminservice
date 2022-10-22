@@ -1,6 +1,7 @@
 const ClienteModelo = require("../models/cliente");
 const {request,response} = require("express");
 
+// Consulta todos los cliente
 function consultarClientes(peticion = request,respuesta = response){
     
     ClienteModelo.find().then((clientes)=>{
@@ -10,6 +11,7 @@ function consultarClientes(peticion = request,respuesta = response){
     });
 }
 
+// Crea un nuevo cliente
 function crearCliente(peticion = request, respuesta = response){
 
     const cliente = peticion.body;
@@ -29,4 +31,39 @@ function crearCliente(peticion = request, respuesta = response){
     });
 }
 
-module.exports = {consultarClientes,crearCliente};
+// Consulta cliente por id, identificacion, nombre y email
+function consultaCliente(peticion = request,respuesta = response){
+    
+    const {id,identificacion,nombre,email} = peticion.body;
+
+    ClienteModelo.findOne({$or: [{identificacion},{nombre},{email},{id}]}).then((resultado)=>{
+        if(resultado){
+            respuesta.send({mensaje: "cliente encontrado",resultado});
+        }else{
+            respuesta.send({mensaje:"Cliente no encontrado"});
+        }
+    }).catch(()=>{
+        respuesta.send({mensaje:"No se pudo encontrar el cliente"});
+    });
+}
+
+// Modifica un cliente
+async function modificarCliente(peticion = request,respuesta = response){
+
+    const {_id, ...cliente} = peticion.body;
+    
+    await ClienteModelo.updateOne({_id:_id},cliente);
+    const clienteModificado = await ClienteModelo.findById(_id);
+    respuesta.send({mensaje:"Se modifico el cliente",clienteModificado});
+   
+}
+
+// Elimina un cliente por ID.
+async function borrarCliente(peticion = request,respuesta = response){
+    const {_id} = peticion.body;
+
+    const eliminado = await ClienteModelo.findByIdAndDelete(_id);
+
+    respuesta.send({mensaje:`Se elimino el cliente: ${eliminado.nombre}`});
+}
+module.exports = {consultarClientes,crearCliente,consultaCliente,modificarCliente,borrarCliente};
