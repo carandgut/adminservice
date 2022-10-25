@@ -1,5 +1,6 @@
 const ClienteModelo = require("../models/cliente");
 const {request,response} = require("express");
+const {hashSync,genSaltSync} = require("bcryptjs");
 
 // Consulta todos los cliente
 function consultarClientes(peticion = request,respuesta = response){
@@ -12,41 +13,44 @@ function consultarClientes(peticion = request,respuesta = response){
 }
 
 // Crea un nuevo cliente
-function crearCliente(peticion = request, respuesta = response){
+async function crearCliente(peticion = request, respuesta = response){
 
-    const cliente = peticion.body;
+    const {identificacion,password} = peticion.body;
 
-    ClienteModelo.findOne({identificacion: peticion.body.identificacion}).then((encontrado)=>{
-        if(encontrado){
-            respuesta.send({mensaje: "cliente ya existe"});
-        }else{
-            ClienteModelo.create(cliente).then((clienteCreado)=>{
-                respuesta.send({mensaje:`Cliente >> ${clienteCreado.nombre} fue creado`});
-            }).catch(()=>{
-                respuesta.send({mensaje:"No se pudo crear el cliente"});
-            });
-        }
-    }).catch(()=>{
-        respuesta.send({mensaje:"Error al buscar cliente para validacion"});
-    });
+   const resultado = await ClienteModelo.findOne({identificacion});
+
+   if(resultado){
+        respuesta.send({mensaje: "cliente ya existe"});
+    }else{
+        peticion.body.password = hashSync(password,genSaltSync()); // Encriptacion de la contraseña.
+    
+        ClienteModelo.create(peticion.body).then((clienteCreado)=>{
+            respuesta.send({mensaje: "El cliente fue creado", clienteCreado});
+        }).catch(()=>{
+            respuesta.send({mensaje:"No se pudo crear el cliente"});
+        });
+    }
 }
 
 // Consulta cliente por id, identificacion, nombre y email
-function consultaCliente(peticion = request,respuesta = response){
+async function consultaCliente(peticion = request,respuesta = response){
     
-    const {id,identificacion,nombre,email} = peticion.body;
+    const {_id,identificacion,nombre,email} = peticion.body;
 
-    ClienteModelo.findOne({$or: [{identificacion},{nombre},{email},{id}]}).then((resultado)=>{
-        if(resultado){
-            respuesta.send({mensaje: "cliente encontrado",resultado});
-        }else{
-            respuesta.send({mensaje:"Cliente no encontrado"});
-        }
-    }).catch(()=>{
-        respuesta.send({mensaje:"No se pudo encontrar el cliente"});
-    });
+    let resultado;
+
+    try {
+        resultado = await ClienteModelo.findOne({$or: [{identificacion},{nombre},{email},{_id}]});
+    } catch (error) {
+        console.log(error);
+    }
+
+    if(resultado){
+        respuesta.send({mensaje: "cliente encontrado",resultado});
+    }else{
+        respuesta.send({mensaje:"Cliente no encontrado"});
+    }
 }
-
 // Modifica un cliente
 async function modificarCliente(peticion = request,respuesta = response){
 
@@ -66,4 +70,5 @@ async function borrarCliente(peticion = request,respuesta = response){
 
     respuesta.send({mensaje:`Se elimino el cliente: ${eliminado.nombre}`});
 }
+
 module.exports = {consultarClientes,crearCliente,consultaCliente,modificarCliente,borrarCliente};

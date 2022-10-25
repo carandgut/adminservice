@@ -10,7 +10,7 @@ const cliente1 = {
     apellido : "ballestero",
     email : "kamilo@gmail.com",
     telefono : "3111020",
-    password : 12345
+    password : "12345"
 }
 
 ClienteModelo.create(cliente1).then((resultado)=>{
