@@ -5,12 +5,12 @@ conexionDb();
 
 const cliente1 = {
     tipoDocumento : "CC",
-    identificacion : "2468101214",
-    nombre : "Fernanda",
-    apellido : "Ascanio",
-    email : "fernanda@gmail.com",
-    telefono : "3124001020",
-    password : 246810
+    identificacion : "1003246878",
+    nombre : "Kamilo",
+    apellido : "ballestero",
+    email : "kamilo@gmail.com",
+    telefono : "3111020",
+    password : "12345"
 }
 
 ClienteModelo.create(cliente1).then((resultado)=>{
